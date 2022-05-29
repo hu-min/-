@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <title>随机妹子图片</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1, width=device-width" />
+  <script src="https://cdn.staticfile.org/react/18.2.0-next-3133dfa6e-20220526/umd/react.development.min.js"></script>
+  <script src="https://cdn.staticfile.org/react-dom/18.2.0-next-3133dfa6e-20220526/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@latest/babel.min.js"></script>
+</head>
+<body>
+  <div id="root" style="display: none; background-color: #121212;"></div>
+  <script type="text/babel">
+    const {
+      CssBaseline, ThemeProvider, Container, createTheme, Backdrop, CircularProgress, useMediaQuery
+    } = MaterialUI;
+    const {
+      useEffect, useMemo, useState
+    } = React
+    function App() {
+      const theme = React.useMemo(() => createTheme({ palette: { mode: 'dark' } }), [useMediaQuery('(prefers-color-scheme: dark)')])
+      useEffect(() => { 
+        refreshImg()
+        document.getElementById('root').style.display = '' 
+      }, [])
+      const [loading, setLoading] = useState(false)
+      const [imgSrc, setImgSrc] = useState()
+      function refreshImg() {
+        setLoading(true)
+        fetch('/api.php').then(res=>res.text()).then(res=>{
+          setImgSrc(res)
+        })
+      }
+      return (
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <img src={imgSrc}
+            onClick={()=>refreshImg()}
+            onLoad={()=>setLoading(false)}
+            style={{objectFit: 'contain', width: '100%', height: '100vh', display: 'block', }}/>
+          <Backdrop open={loading}><CircularProgress color="inherit" /></Backdrop>
+        </ThemeProvider>
+      )
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+  </script>
+</body>
+</html>
